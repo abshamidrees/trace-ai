@@ -1,0 +1,16 @@
+# Trace AI — Cursor Rules
+
+- Always use TypeScript with strict mode
+- Never use the `any` type — use proper interfaces from lib/types.ts
+- Canvas graph engine (FundFlowGraph.tsx) must use pure Canvas API only — no D3, no Cytoscape, no external graph libraries
+- All mock/demo data lives in lib/api.ts only — never inside component files
+- Backend uses Python 3.11+ with type hints on every function
+- Remove unused imports on every file you touch
+- Never add placeholder comments like "// TODO implement this" — either implement it or skip it
+- All components are client components unless explicitly marked server-side
+- Graph node positions come from GraphNode.x/y — never randomise them
+- Risk colours: high=#ff4d6a, medium=#ffad3b, low=#36d399
+- Primary accent: #7f5af0 (violet), secondary: #2dd4bf (teal)
+- OpenGradient brand colour #49F5FF is used in the footer only — nowhere else
+- When the backend is unreachable, always fall back to generateDemoData() — never show a blank state
+- Fullscreen graph: position:fixed, inset:0, z-index:9999, Escape key exits

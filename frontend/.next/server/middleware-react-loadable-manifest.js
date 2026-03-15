@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"app\\\\analyze\\\\[address]\\\\page.tsx -> ../../../components/FundFlowGraph\":{\"id\":\"app\\\\analyze\\\\[address]\\\\page.tsx -> ../../../components/FundFlowGraph\",\"files\":[\"static/chunks/_app-pages-browser_components_FundFlowGraph_tsx.js\"]}}"
