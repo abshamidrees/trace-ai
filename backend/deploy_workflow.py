@@ -8,15 +8,20 @@ private_key = os.getenv("OG_PRIVATE_KEY")
 rpc_url = os.getenv("OG_RPC_URL", "https://rpc.opengradient.ai")
 
 if not private_key:
-    print("❌ ERROR: OG_PRIVATE_KEY missing in .env")
+    print("❌ OG_PRIVATE_KEY missing in .env")
     exit(1)
 
 print("🔗 Connecting to OpenGradient...")
 
-# Deploy TEE LLM workflow (current SDK API)
-workflow = og.TEE_LLM(
-    model="meta-llama/Llama-3.1-8B-Instruct",
-    name="trace-ai-sybil-detector",
+alpha = og.Alpha(private_key=private_key, rpc_url=rpc_url)
+
+print("🚀 Deploying real TEE LLM workflow...")
+
+# Use a known public model CID (from docs/examples)
+model_cid = "QmRhcpDXfYCKsimTmJYrAVM4Bbvck59Zb2onj3MHv9Kw5N"  # Llama-3.1-8B example
+
+workflow = alpha.deploy_llm(
+    model_cid=model_cid,
     system_prompt="""You are a blockchain forensics AI specialising in Sybil detection.
 Analyse the wallet transaction data provided and return ONLY a valid JSON object with this exact shape:
 
@@ -29,10 +34,11 @@ Analyse the wallet transaction data provided and return ONLY a valid JSON object
     {"label": "signal name", "severity": "high|medium|low", "description": "what was detected"}
   ]
 }
-"""
-).deploy()
+""",
+    mode="tee"
+)
 
-print("\n✅ TEE Workflow deployed successfully!")
-print("Contract address:", workflow.contract_address)
-print("\nCopy this address and add it to your root .env file:")
-print(f"OG_WORKFLOW_ADDRESS={workflow.contract_address}")
+print("\n✅ Real TEE Workflow deployed!")
+print("Contract address:", workflow.address)
+print("\nAdd this to your .env:")
+print(f"OG_WORKFLOW_ADDRESS={workflow.address}")

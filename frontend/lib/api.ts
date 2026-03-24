@@ -39,15 +39,16 @@ export async function analyzeWallet(address: string): Promise<AnalysisResult> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address: address.trim() }),
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(90_000),
     })
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
       throw new Error(err.detail || `Backend ${res.status}`)
     }
     return await res.json() as AnalysisResult
-  } catch {
-    return generateDemoData(address)
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Unknown error'
+    throw new Error(msg)
   }
 }
 

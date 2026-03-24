@@ -5,9 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import type { AnalysisResult, Chain, RiskLevel } from '../../../lib/types'
 import { analyzeWallet, detectChain, shortenAddress } from '../../../lib/api'
-import RiskCard    from '../../../components/RiskCard'
-import ProofViewer from '../../../components/ProofViewer'
-import WalletList  from '../../../components/WalletList'
+import RiskCard   from '../../../components/RiskCard'
+import WalletList from '../../../components/WalletList'
 
 const FundFlowGraph = dynamic(() => import('../../../components/FundFlowGraph'), { ssr: false })
 
@@ -166,11 +165,21 @@ export default function AnalyzePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="glass rounded-2xl p-12 text-center max-w-md mx-4">
-          <div className="font-display font-bold text-white text-xl mb-2">Analysis Failed</div>
-          <p className="text-[13px] mb-6" style={{ color:'#64748b' }}>{error || 'Unknown error.'}</p>
-          <button onClick={() => router.push('/')} className="btn-primary px-6 py-2.5 text-sm">
-            Try another address
-          </button>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>⚡</div>
+          <div className="font-display font-bold text-white text-xl mb-2">High Traffic — Try Again</div>
+          <p className="text-[13px] mb-6" style={{ color:'#64748b' }}>
+            {error?.includes('timeout') || error?.includes('fetch')
+              ? 'The network is busy right now. Wait a moment and try again.'
+              : error || 'Something went wrong. Please try again.'}
+          </p>
+          <div className="flex gap-3 justify-center flex-wrap">
+            <button onClick={() => { window.location.reload() }} className="btn-primary px-6 py-2.5 text-sm">
+              Try Again
+            </button>
+            <button onClick={() => router.push('/')} className="btn-ghost px-6 py-2.5 text-sm">
+              New Search
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -196,12 +205,7 @@ export default function AnalyzePage() {
 
             <div className="flex items-center gap-3 flex-wrap mb-2">
               <h1 className="font-display font-bold text-white text-xl">Wallet Analysis</h1>
-              {result.dataSource === 'demo' && (
-                <span className="text-[10px] font-mono px-2.5 py-1 rounded-full"
-                      style={{ background:'rgba(255,173,59,0.09)', border:'1px solid rgba(255,173,59,0.28)', color:'#ffad3b' }}>
-                  Demo Mode — set API keys for live data
-                </span>
-              )}
+
             </div>
 
             <div className="flex items-center gap-2.5 flex-wrap">
@@ -249,44 +253,47 @@ export default function AnalyzePage() {
           </div>
         </div>
 
-        {/* Main grid */}
+        {/* Main grid: 3 cols */}
         <div className="grid lg:grid-cols-3 gap-5">
 
-          {/* Graph — full height, 2 cols */}
-          <div className="lg:col-span-2 glass rounded-2xl overflow-hidden" style={{ height: 540 }}>
-            <FundFlowGraph data={result.graph} />
+          {/* Left 2 cols: Graph on top, Connected Wallets below */}
+          <div className="lg:col-span-2 flex flex-col gap-5">
+            <div className="glass rounded-2xl overflow-hidden" style={{ height: 540 }}>
+              <FundFlowGraph data={result.graph} />
+            </div>
+            <WalletList wallets={result.connectedWallets} />
           </div>
 
-          {/* Right column */}
-          <div className="flex flex-col gap-5">
+          {/* Right col: AI Risk Assessment */}
+          <div>
             <RiskCard result={result} />
           </div>
         </div>
 
-        {/* Wallets + Proof */}
-        <div className="grid lg:grid-cols-3 gap-5 mt-5">
-          <div className="lg:col-span-2">
-            <WalletList wallets={result.connectedWallets} />
-          </div>
-          <div>
-            <ProofViewer proof={result.proof} />
-          </div>
-        </div>
-
-        {/* Transactions */}
+        {/* Transactions full width */}
         <div className="mt-5">
           <TxTable txns={result.recentTransactions} />
         </div>
 
         {/* Share */}
         <div className="mt-8 flex flex-wrap gap-2.5 justify-center">
-          {[
-            { label:'Copy report link', action:()=>navigator.clipboard.writeText(window.location.href) },
-            { label:'Share on X',       action:()=>window.open(`https://twitter.com/intent/tweet?text=Traced+${shortenAddress(address)}+with+TraceAI+—+Risk:+${result.riskLevel.toUpperCase()}+${result.riskScore}/100+%23OpenGradient`) },
-            { label:'Print report',     action:()=>window.print() },
-          ].map(b => (
-            <button key={b.label} onClick={b.action} className="btn-ghost px-5 py-2.5 text-[13px]">{b.label}</button>
-          ))}
+          <button onClick={() => navigator.clipboard.writeText(window.location.href)}
+                  className="btn-ghost px-5 py-2.5 text-[13px]">
+            Copy report link
+          </button>
+          <button onClick={() => {
+            const tweets = [
+              `I thought this wallet was normal, until I traced it.\n\nFull cross-chain fund flow, real counterparties, and a TEE-verified risk score in seconds.\n\nTry it yourself: trytraceai.xyz\n\nBuilt by @realAbsham. Powered by @OpenGradient.`,
+              `On-chain data is public, but not easy to understand.\n\nTrace AI turns any wallet into a clear fund flow graph with AI-powered, TEE verified risk scoring.\n\nPowered by @OpenGradient\n\ntrytraceai.xyz`,
+              `just pasted a wallet into this and it exposed EVERYTHING 😭\n\nwho it sent to\nwhere it bridged\nwhat it touched\n\nand gave a risk score too\n\ntrytraceai.xyz\n\nBuilt by @realAbsham`,
+              `nah this is actually wild\n\none wallet → full network exposed\ncross-chain flows, connections, risk score…\n\nwe are NOT ready for this 😭\n\ntrytraceai.xyz\n\nBuilt by @realAbsham`,
+              `just realized how easy it is to spot sybils now…\n\npaste wallet → see whole cluster → get risk score\n\ntrytraceai.xyz`,
+            ]
+            const tweet = tweets[Math.floor(Math.random() * tweets.length)]
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`, '_blank')
+          }} className="btn-ghost px-5 py-2.5 text-[13px]">
+            Share on X
+          </button>
         </div>
 
       </div>

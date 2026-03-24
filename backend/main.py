@@ -10,16 +10,29 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+# Load .env — check both backend/ and parent dir so it works
+# whether you run from backend/ or from the repo root
+_here = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(dotenv_path=os.path.join(_here, '.env'))
+load_dotenv(dotenv_path=os.path.join(_here, '..', '.env'))
+
 import blockchain
 import opengradient_agent
-
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Trace AI API", version="1.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://trytraceai.xyz",
+        "https://www.trytraceai.xyz",
+        "https://trace-ai.vercel.app",  # your vercel URL (you can change later)
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 
 class AnalyzeRequest(BaseModel):
@@ -28,7 +41,13 @@ class AnalyzeRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "timestamp": int(time.time() * 1000)}
+    return {
+        "status": "ok",
+        "timestamp": int(time.time() * 1000),
+        "og_sdk": opengradient_agent.OG_AVAILABLE,
+        "etherscan_key": bool(os.getenv("ETHERSCAN_API_KEY")),
+        "helius_key": bool(os.getenv("HELIUS_API_KEY")),
+    }
 
 
 @app.post("/analyze")
@@ -48,6 +67,8 @@ async def analyze(req: AnalyzeRequest):
             transactions = blockchain.fetch_solana_transactions(address, os.getenv("HELIUS_API_KEY", ""))
         else:
             transactions = blockchain.fetch_evm_transactions(address, os.getenv("ETHERSCAN_API_KEY", ""), chain)
+
+        logger.info("Fetched %d transactions for %s (chain: %s)", len(transactions), address[:10], chain)
 
         # Build graph
         graph_data, graph_summary = blockchain.build_graph(address, chain, transactions)
@@ -76,6 +97,11 @@ async def analyze(req: AnalyzeRequest):
         # Recent transactions (most recent 15)
         recent_txns = sorted(transactions, key=lambda t: t.get("timestamp", 0), reverse=True)[:15]
 
+        # dataSource:
+        #   "live"  — real blockchain data was fetched (even if OG TEE failed)
+        #   "demo"  — no API keys, zero transactions returned
+        data_source = "live"  # always live — empty wallet is valid, not demo
+
         return {
             "targetAddress":      address,
             "chain":              chain,
@@ -99,10 +125,10 @@ async def analyze(req: AnalyzeRequest):
                 "rawProof":         proof.get("rawProof", {}),
                 "verifiable":       proof.get("verifiable", False),
             },
-            "dataSource": "live" if source == "opengradient_tee" else "demo",
+            "dataSource":         data_source,
+            "aiSource":           source,  # "opengradient_tee" | "heuristic_fallback"
         }
 
     except Exception as e:
-        logger.error("Analysis failed for %s: %s", address[:12], e)
-        # Return demo-like data so UI never shows a blank error
+        logger.error("Analysis failed for %s: %s", address[:12], e, exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
