@@ -1,11 +1,11 @@
+/* ── Fonts ─────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Fonts ─────────────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
-
-/* ── Tokens ────────────────────────────────────────────────────────────────── */
+/* ── Tokens ────────────────────────────────────────────────────────────── */
 :root {
   --bg:      #06060f;
   --s1:      #0d0c1d;
@@ -65,7 +65,7 @@ body {
   cursor: pointer;
   transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
 }
-.btn-primary:hover   { opacity: 0.88; transform: translateY(px); box-shadow: 0 8px 28px rgba(127,90,240,0.42); }
+.btn-primary:hover   { opacity: 0.88; transform: translateY(2px); box-shadow: 0 8px 28px rgba(127,90,240,0.42); }
 .btn-primary:active  { transform: translateY(0); }
 .btn-primary:disabled{ opacity: 0.4; cursor: not-allowed; transform: none; }
 
