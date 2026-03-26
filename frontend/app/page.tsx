@@ -55,18 +55,12 @@ export default function HomePage() {
   const chainLabel = chain && chain !== 'unknown' ? CHAIN_LABELS[chain] || chain.toUpperCase() : null
 
   const handleAnalyze = useCallback(() => {
-    // Block if already loading — no double requests
-    if (loading) return
-
     const trimmed = address.trim()
     if (!trimmed)                  { setError('Paste a wallet address to get started.'); return }
     if (!validateAddress(trimmed)) { setError('Invalid address. Paste an EVM (0x…) or Solana address.'); return }
-
-    // Lock immediately on first valid click
     setLoading(true)
-    setError('')
     router.push(`/analyze/${encodeURIComponent(trimmed)}`)
-  }, [address, router, loading])
+  }, [address, router])
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-24 pb-14">
@@ -148,43 +142,26 @@ export default function HomePage() {
               onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
               onFocus={() => setFocused(true)}
               onBlur={()  => setFocused(false)}
-              placeholder="Paste wallet address (EVM / Solana)…"
+              placeholder="Paste wallet address (ETH / Base / Solana / TON)…"
               className="trace-input pr-36"
               style={{ paddingLeft: chainLabel ? '72px' : '22px' }}
               spellCheck={false}
               autoComplete="off"
-              disabled={loading}
             />
 
             <button
               onClick={handleAnalyze}
               disabled={loading}
               className="btn-primary absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2"
-              style={{
-                fontSize: 13.5,
-                // Black & white loading state
-                ...(loading && {
-                  background: '#1a1a1a',
-                  color: '#888888',
-                  boxShadow: 'none',
-                  cursor: 'not-allowed',
-                }),
-              }}
+              style={{ fontSize: 13.5 }}
             >
               {loading ? (
                 <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg
-                    className="animate-spin"
-                    width="13"
-                    height="13"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    style={{ color: '#666666' }}
-                  >
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeOpacity="0.2" />
+                  <svg className="animate-spin" width="14" height="14" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeOpacity="0.25" />
                     <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Analyzing…
+                  Loading…
                 </span>
               ) : 'Analyze'}
             </button>
