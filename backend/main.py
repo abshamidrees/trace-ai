@@ -24,14 +24,9 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Trace AI API", version="1.0.0")
 app.add_middleware(CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://trytraceai.xyz",
-        "https://www.trytraceai.xyz",
-        "https://trace-ai.vercel.app",  # your vercel URL (you can change later)
-    ],
+    allow_origins=["*"],
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 
