@@ -89,7 +89,7 @@ export default function HomePage() {
 
         {/* Headline */}
         <h1
-          className="font-sans font-black text-5xl sm:text-7xl md:text-8xl leading-[1.05] mb-5 tracking-[-0.04em] animate-fade-up"
+          className="font-sans font-black text-5xl sm:text-7xl md:text-7xl leading-[1.05] mb-5 tracking-[-0.04em] animate-fade-up"
           style={{ animationDelay: '0.08s' }}
         >
           <span style={{ color: '#e2e8f0' }}>Wallet Intelligence</span>
