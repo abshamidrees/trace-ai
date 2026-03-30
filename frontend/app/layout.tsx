@@ -83,7 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 href="https://opengradient.ai"
                 target="_blank"
                 rel="noreferrer"
-                style={{ color: '#49F5FF' }}
+                style={{ color: '#475569' }}
                 className="hover:opacity-80 transition-opacity"
               >
                 OpenGradient

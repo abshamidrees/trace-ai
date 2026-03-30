@@ -84,15 +84,17 @@ export default function HomePage() {
           }}
         >
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#7f5af0' }} />
-          Powered by OpenGradient — TEE-Verified AI
+          Powered by OpenGradient
         </div>
 
         {/* Headline */}
         <h1
-          className="font-display font-extrabold text-5xl sm:text-6xl md:text-7xl leading-[1.05] mb-5 animate-fade-up"
+          className="font-sans font-black text-5xl sm:text-7xl md:text-8xl leading-[1.05] mb-5 tracking-[-0.04em] animate-fade-up"
           style={{ animationDelay: '0.08s' }}
         >
-          <span style={{ color: '#e2e8f0' }}>Trace the money.</span>
+          <span style={{ color: '#e2e8f0' }}>Wallet Intelligence</span>
+          <br />
+          <span style={{ color: '#94a3b8', fontWeight: 400, fontSize: '0.48em' }}>powered by</span>
           <br />
           <span
             style={{
@@ -101,7 +103,7 @@ export default function HomePage() {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            Expose the truth.
+            Verifiable AI
           </span>
         </h1>
 
@@ -241,7 +243,7 @@ export default function HomePage() {
         </h2>
         <div className="grid md:grid-cols-3 gap-4">
           {[
-            { step: '01', title: 'Paste any wallet',    body: 'ETH, Base, Arbitrum, Optimism, Solana. No wallet connection ever required.',                                             col: '#7f5af0' },
+            { step: '01', title: 'Paste any wallet',    body: 'ETH, Base, Arbitrum, Polygon, Solana. No wallet connection ever required.',                                             col: '#7f5af0' },
             { step: '02', title: 'AI traces the funds', body: 'OpenGradient runs Sybil detection inside a TEE. Every result is verifiable on-chain.',                                   col: '#2dd4bf' },
             { step: '03', title: 'Explore the graph',   body: 'Interactive fund-flow network reveals every connected wallet, bridge hop, and suspicious cluster.',                       col: '#a78bfa' },
           ].map(item => (

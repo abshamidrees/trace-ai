@@ -37,20 +37,104 @@ const TX_EXPLORER: Record<string,string> = {
 
 // ── Loading skeleton ──────────────────────────────────────────────────────────
 function Skeleton() {
+  const [step, setStep] = useState(0)
+  const steps = [
+    { icon: '🔗', label: 'Fetching cross-chain data',  detail: 'ETH · ARB · Base · Polygon · Solana' },
+    { icon: '🗺️', label: 'Building flow map',           detail: 'Mapping counterparties and bridges'  },
+    { icon: '🤖', label: 'Running AI analysis',         detail: 'Claude Sonnet inside OpenGradient TEE' },
+    { icon: '🔐', label: 'Verifying computation',       detail: 'Intel TDX attestation'               },
+  ]
+
+  useEffect(() => {
+    const timings = [0, 8000, 18000, 28000]
+    const timers = timings.map((t, i) => setTimeout(() => setStep(i), t))
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4 md:px-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <div className="skeleton h-7 w-52 mb-3" />
-        <div className="skeleton h-4 w-80" />
-      </div>
-      <div className="grid lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 skeleton rounded-2xl" style={{ height: 520 }} />
-        <div className="space-y-5">
-          <div className="skeleton rounded-2xl" style={{ height: 280 }} />
-          <div className="skeleton rounded-2xl" style={{ height: 200 }} />
+    <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: '#06060f' }}>
+      <div style={{ width: '100%', maxWidth: 420 }}>
+
+        {/* Header */}
+        <div style={{ marginBottom: 40, textAlign: 'center' }}>
+          <div style={{ fontFamily: 'Space Mono, monospace', fontSize: 11, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+            Analyzing wallet
+          </div>
+          <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: '#94a3b8' }}>
+            This takes 20–40 seconds
+          </div>
         </div>
+
+        {/* Steps */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {steps.map((s, i) => {
+            const isDone    = i < step
+            const isActive  = i === step
+            const isPending = i > step
+            return (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 16,
+                padding: '14px 18px', borderRadius: 12,
+                background: isActive  ? 'rgba(127,90,240,0.08)' : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${isActive ? 'rgba(127,90,240,0.3)' : isDone ? 'rgba(54,211,153,0.2)' : 'rgba(255,255,255,0.04)'}`,
+                transition: 'all 0.4s ease',
+                opacity: isPending ? 0.4 : 1,
+              }}>
+                {/* Status icon */}
+                <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: isDone ? 'rgba(54,211,153,0.12)' : isActive ? 'rgba(127,90,240,0.12)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${isDone ? 'rgba(54,211,153,0.3)' : isActive ? 'rgba(127,90,240,0.3)' : 'transparent'}`,
+                }}>
+                  {isDone ? (
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#36d399" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : isActive ? (
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7f5af0', animation: 'pulse 1.2s ease-in-out infinite' }} />
+                  ) : (
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#334155' }} />
+                  )}
+                </div>
+
+                {/* Text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13.5, fontWeight: 500,
+                    color: isDone ? '#36d399' : isActive ? '#e2e8f0' : '#475569',
+                    marginBottom: 2, transition: 'color 0.3s',
+                  }}>
+                    {s.label}
+                  </div>
+                  <div style={{ fontFamily: 'Space Mono, monospace', fontSize: 10, color: isActive ? '#64748b' : '#2d2b4a', transition: 'color 0.3s' }}>
+                    {s.detail}
+                  </div>
+                </div>
+
+                {/* Active spinner */}
+                {isActive && (
+                  <svg className="animate-spin" width="14" height="14" fill="none" viewBox="0 0 24 24" style={{ flexShrink: 0, color: '#7f5af0' }}>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.2" />
+                    <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ marginTop: 28, height: 2, background: 'rgba(255,255,255,0.04)', borderRadius: 99, overflow: 'hidden' }}>
+          <div style={{
+            height: '100%', borderRadius: 99,
+            background: 'linear-gradient(90deg, #7f5af0, #2dd4bf)',
+            width: `${((step + 1) / steps.length) * 100}%`,
+            transition: 'width 0.8s ease',
+          }} />
+        </div>
+        <div style={{ marginTop: 8, textAlign: 'right', fontFamily: 'Space Mono, monospace', fontSize: 10, color: '#2d2b4a' }}>
+          Step {step + 1} of {steps.length}
+        </div>
+
       </div>
-      <div className="mt-5 skeleton rounded-2xl" style={{ height: 160 }} />
     </div>
   )
 }
