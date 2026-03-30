@@ -61,7 +61,7 @@ function Skeleton() {
             Analyzing wallet
           </div>
           <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: '#94a3b8' }}>
-            This takes 20–40 seconds
+            This takes 10–30 seconds
           </div>
         </div>
 
