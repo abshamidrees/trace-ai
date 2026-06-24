@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
 
         <main>{children}</main>
+        <SpeedInsights />
 
         {/* ── Footer ───────────────────────────────────────────────────────── */}
         <footer style={{ borderTop: '1px solid #1e1b3a', marginTop: 80, padding: '28px 24px' }}>
